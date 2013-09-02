@@ -1,7 +1,6 @@
 import au3bind
 import os
 import time
-import subprocess
 import ctypes
 
 
