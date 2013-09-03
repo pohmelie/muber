@@ -2,6 +2,7 @@ import au3bind
 import os
 import time
 import subprocess
+import math
 
 
 def netstat(dst_ips, dst_ports):
@@ -55,6 +56,7 @@ class D2Window():
         self.password = password
         self.title = D2Window.title_base + str(D2Window.title_num)
         self.au3 = au3
+        self.start_time = 0
 
         D2Window.title_num += 1
 
@@ -109,8 +111,6 @@ class D2Window():
 
                 if self.check_rect(*D2Window.screens[action]):
 
-                    print("checked", action)
-
                     if action == "INIT":
 
                         self.send("{ENTER}")
@@ -158,65 +158,58 @@ class D2Window():
 
                 time.sleep(1)
 
+        self.start_time = time.time()
         return True
 
 
+def muber(dst_ips, dst_ports, accounts, starter):
 
-class Muber():
+    timeout = 10
+    games_per_ip = math.ceil(len(accounts) / len(dst_ips))
+    au3 = au3bind.autoit()
+    nstat = lambda: netstat(dst_ips, dst_ports)
 
-    def __init__(self, dst_ips, dst_ports, accounts, starter):
+    au3.AU3_AutoItSetOption("SendKeyDelay", 20)
+    au3.AU3_AutoItSetOption("SendKeyDownDelay", 20)
+    au3.AU3_AutoItSetOption("SendCapslockMode", 0)
+    au3.AU3_AutoItSetOption("WinTitleMatchMode", 2)
+    au3.AU3_AutoItSetOption("MouseClickDownDelay", 25)
+    au3.AU3_AutoItSetOption("MouseCoordMode", 2)
+    au3.AU3_AutoItSetOption("PixelCoordMode", 2)
 
-        self.dst_ips = dst_ips
-        self.dst_ports = dst_ports
-        self.accounts = accounts
-        self.starter = starter
+    wins = []
+    for account, password in accounts:
 
-        self.au3 = au3bind.autoit()
+        wins.append(D2Window(account, password, starter, au3))
 
-        self.au3.AU3_AutoItSetOption("SendKeyDelay", 20)
-        self.au3.AU3_AutoItSetOption("SendKeyDownDelay", 20)
-        self.au3.AU3_AutoItSetOption("SendCapslockMode", 0)
-        self.au3.AU3_AutoItSetOption("WinTitleMatchMode", 2)
-        self.au3.AU3_AutoItSetOption("MouseClickDownDelay", 25)
-        self.au3.AU3_AutoItSetOption("MouseCoordMode", 2)
-        self.au3.AU3_AutoItSetOption("PixelCoordMode", 2)
+    while True:
+
+        ns = nstat()
+        badwins = []
+
+        for win in wins:
+
+            if win.pid not in ns:
+
+                while win.join():
+
+                    ns = nstat()
+
+                    if tuple(ns.values()).count(ns[win.pid]) <= games_per_ip:
+
+                        break
+
+                else:
+
+                    badwins.append(win)
 
 
-    def start(self):
-
-        pass
+        wins = list(filter(lambda w: w not in badwins, wins))
+        time.sleep(timeout)
 
 
 dst_ips = ("212.42.38.182", "212.42.38.174", "212.42.38.87")
 dst_ports = ("4000",)
+accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
 
-au3 = au3bind.autoit()
-
-au3.AU3_AutoItSetOption("SendKeyDelay", 20)
-au3.AU3_AutoItSetOption("SendKeyDownDelay", 20)
-au3.AU3_AutoItSetOption("SendCapslockMode", 0)
-au3.AU3_AutoItSetOption("WinTitleMatchMode", 2)
-au3.AU3_AutoItSetOption("MouseClickDownDelay", 25)
-au3.AU3_AutoItSetOption("MouseCoordMode", 2)
-au3.AU3_AutoItSetOption("PixelCoordMode", 2)
-
-win = D2Window("fa1", "fa", lambda: os.startfile("d2.lnk"), au3)
-print(win.join())
-
-'''
-os.startfile("d2.lnk")
-au3.AU3_WinWaitActive("Diablo")
-au3.AU3_MouseMove(-100, -100, 0)
-
-while True:
-
-    print("(350, 250, 450, 300) ->", au3.AU3_PixelChecksum(350, 250, 450, 300))
-    print("(250, 500, 350, 575) ->", au3.AU3_PixelChecksum(250, 500, 350, 575))
-    print("(30, 540, 160, 580) ->", au3.AU3_PixelChecksum(30, 540, 160, 580))
-    print("(540, 450, 770, 485) ->", au3.AU3_PixelChecksum(540, 450, 770, 485))
-    print("(0, 550, 30, 600) ->", au3.AU3_PixelChecksum(0, 550, 30, 600))
-
-    print()
-
-    time.sleep(1)
-'''
+muber(dst_ips, dst_ports, accounts, lambda: os.startfile("d2.lnk"))
