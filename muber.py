@@ -223,19 +223,6 @@ def muber(dst_ips, dst_ports, accounts, starter):
                     badwins.append(win)
                     print(str.format("*{} wrong acc or pass", win.account))
 
-            else:
-
-                au3.AU3_WinSetTitle(
-                    win.title,
-                    "",
-                    str.format(
-                        "{} [{}] [{}]",
-                        win.title,
-                        seconds_to_human(time.time() - win.start_time),
-                        ns[win.pid]
-                    )
-                )
-
         wins = list(filter(lambda w: w not in badwins, wins))
         time.sleep(timeout)
 
