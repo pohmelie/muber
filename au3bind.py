@@ -134,7 +134,7 @@ class AutoItX3():
 
         self.au3.AU3_DriveMapAdd.restype = None
         self.au3.AU3_DriveMapAdd.argtypes = (c_wchar_p, c_wchar_p, c_long, c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_DriveMapAdd = ResultWrapper(self.au3.AU3_DriveMapAdd, int)
+        self.AU3_DriveMapAdd = lambda szDevice, szShare, nFlags, szUser="", szPwd="": ResultWrapper(self.au3.AU3_DriveMapAdd, int)(szDevice, szShare, nFlags, szUser, szPwd)
 
         self.au3.AU3_DriveMapDel.restype = c_long
         self.au3.AU3_DriveMapDel.argtypes = (c_wchar_p, )
@@ -270,11 +270,11 @@ class AutoItX3():
 
         self.au3.AU3_Send.restype = None
         self.au3.AU3_Send.argtypes = (c_wchar_p, c_long, )
-        self.AU3_Send = lambda szSendText, nMode="": self.au3.AU3_Send(szSendText, nMode)
+        self.AU3_Send = lambda szSendText, nMode=0: self.au3.AU3_Send(szSendText, nMode)
 
         self.au3.AU3_SendA.restype = None
         self.au3.AU3_SendA.argtypes = (c_char_p, c_long, )
-        self.AU3_SendA = lambda szSendText, nMode="": self.au3.AU3_SendA(szSendText, nMode)
+        self.AU3_SendA = lambda szSendText, nMode=0: self.au3.AU3_SendA(szSendText, nMode)
 
         self.au3.AU3_Shutdown.restype = c_long
         self.au3.AU3_Shutdown.argtypes = (c_long, )
@@ -286,7 +286,7 @@ class AutoItX3():
 
         self.au3.AU3_StatusbarGetText.restype = None
         self.au3.AU3_StatusbarGetText.argtypes = (c_wchar_p, c_wchar_p, c_long, c_wchar_p, c_int, )
-        self.AU3_StatusbarGetText = ResultWrapper(self.au3.AU3_StatusbarGetText)
+        self.AU3_StatusbarGetText = lambda szTitle, szText="", nPart=1: ResultWrapper(self.au3.AU3_StatusbarGetText)(szTitle, szText, nPart)
 
         self.au3.AU3_ToolTip.restype = None
         self.au3.AU3_ToolTip.argtypes = (c_wchar_p, c_long, c_long, )
@@ -318,7 +318,7 @@ class AutoItX3():
 
         self.au3.AU3_WinGetClassList.restype = None
         self.au3.AU3_WinGetClassList.argtypes = (c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_WinGetClassList = ResultWrapper(self.au3.AU3_WinGetClassList)
+        self.AU3_WinGetClassList = lambda szTitle, szText="": ResultWrapper(self.au3.AU3_WinGetClassList)(szTitle, szText)
 
         self.au3.AU3_WinGetClientSizeHeight.restype = c_long
         self.au3.AU3_WinGetClientSizeHeight.argtypes = (c_wchar_p, c_wchar_p, )
@@ -330,7 +330,7 @@ class AutoItX3():
 
         self.au3.AU3_WinGetHandle.restype = None
         self.au3.AU3_WinGetHandle.argtypes = (c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_WinGetHandle = ResultWrapper(self.au3.AU3_WinGetHandle)
+        self.AU3_WinGetHandle = lambda szTitle, szText="": ResultWrapper(self.au3.AU3_WinGetHandle)(szTitle, szText)
 
         self.au3.AU3_WinGetPosX.restype = c_long
         self.au3.AU3_WinGetPosX.argtypes = (c_wchar_p, c_wchar_p, )
@@ -350,7 +350,7 @@ class AutoItX3():
 
         self.au3.AU3_WinGetProcess.restype = None
         self.au3.AU3_WinGetProcess.argtypes = (c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_WinGetProcess = ResultWrapper(self.au3.AU3_WinGetProcess, int)
+        self.AU3_WinGetProcess = lambda szTitle, szText="": ResultWrapper(self.au3.AU3_WinGetProcess, int)(szTitle, szText)
 
         self.au3.AU3_WinGetState.restype = c_long
         self.au3.AU3_WinGetState.argtypes = (c_wchar_p, c_wchar_p, )
@@ -358,11 +358,11 @@ class AutoItX3():
 
         self.au3.AU3_WinGetText.restype = None
         self.au3.AU3_WinGetText.argtypes = (c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_WinGetText = ResultWrapper(self.au3.AU3_WinGetText)
+        self.AU3_WinGetText = lambda szTitle, szText="": ResultWrapper(self.au3.AU3_WinGetText)(szTitle, szText)
 
         self.au3.AU3_WinGetTitle.restype = None
         self.au3.AU3_WinGetTitle.argtypes = (c_wchar_p, c_wchar_p, c_wchar_p, c_int, )
-        self.AU3_WinGetTitle = ResultWrapper(self.au3.AU3_WinGetTitle)
+        self.AU3_WinGetTitle = lambda szTitle, szText="": ResultWrapper(self.au3.AU3_WinGetTitle)(szTitle, szText)
 
         self.au3.AU3_WinKill.restype = c_long
         self.au3.AU3_WinKill.argtypes = (c_wchar_p, c_wchar_p, )
