@@ -69,7 +69,8 @@ class D2Window():
 
             time.sleep(1)
 
-        self.au3.AU3_MouseMove(0, 0, 0)
+        self.au3.AU3_MouseMove(0, 0)
+        time.sleep(2)
 
 
     def check_rect(self, rect, rect_hash):
@@ -202,7 +203,7 @@ def muber(dst_ips, dst_ports, accounts, starter):
 
                     print(
                         str.format(
-                            "account '{}' dropped after {}",
+                            "*{} dropped after {}",
                             win.account,
                             seconds_to_human(time.time() - win.start_time)
                         )
@@ -214,13 +215,13 @@ def muber(dst_ips, dst_ports, accounts, starter):
 
                     if tuple(ns.values()).count(ns[win.pid]) <= games_per_ip:
 
-                        print(str.format("account '{}' on '{}'", win.account, ns[win.pid]))
+                        print(str.format("*{} -> {}", win.account, ns[win.pid]))
                         break
 
                 else:
 
                     badwins.append(win)
-                    print(str.format("account '{}' wrong acc or pass", win.account))
+                    print(str.format("*{} wrong acc or pass", win.account))
 
 
         wins = list(filter(lambda w: w not in badwins, wins))
