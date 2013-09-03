@@ -159,6 +159,7 @@ class D2Window():
 
                 time.sleep(1)
 
+        self.send("m")
         self.start_time = time.time()
         return True
 
