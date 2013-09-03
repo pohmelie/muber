@@ -56,7 +56,7 @@ class D2Window():
         self.password = password
         self.title = D2Window.title_base + str(D2Window.title_num)
         self.au3 = au3
-        self.start_time = 0
+        self.start_time = None
 
         D2Window.title_num += 1
 
@@ -162,6 +162,13 @@ class D2Window():
         return True
 
 
+def seconds_to_human(x):
+
+    x, s = divmod(int(x), 60)
+    h, m = divmod(x, 60)
+    return str.format("{:0>2}:{:0>2}:{:0>2}", h, m, s)
+
+
 def muber(dst_ips, dst_ports, accounts, starter):
 
     timeout = 10
@@ -191,25 +198,39 @@ def muber(dst_ips, dst_ports, accounts, starter):
 
             if win.pid not in ns:
 
+                if win.start_time:
+
+                    print(
+                        str.format(
+                            "account '{}' dropped after {}",
+                            win.account,
+                            seconds_to_human(time.time() - win.start_time)
+                        )
+                    )
+
                 while win.join():
 
                     ns = nstat()
 
                     if tuple(ns.values()).count(ns[win.pid]) <= games_per_ip:
 
+                        print(str.format("account '{}' on '{}'", win.account, ns[win.pid]))
                         break
 
                 else:
 
                     badwins.append(win)
+                    print(str.format("account '{}' wrong acc or pass", win.account))
 
 
         wins = list(filter(lambda w: w not in badwins, wins))
         time.sleep(timeout)
 
 
-dst_ips = ("212.42.38.182", "212.42.38.174", "212.42.38.87")
-dst_ports = ("4000",)
-accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
+if __name__ == "__main__":
 
-muber(dst_ips, dst_ports, accounts, lambda: os.startfile("d2.lnk"))
+    dst_ips = ("212.42.38.182", "212.42.38.174", "212.42.38.87")
+    dst_ports = ("4000",)
+    accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
+
+    muber(dst_ips, dst_ports, accounts, lambda: os.startfile("d2.lnk"))
