@@ -69,7 +69,7 @@ class D2Window():
 
             time.sleep(1)
 
-        self.au3.AU3_MouseMove(0, 0)
+        self.au3.AU3_MouseMove(10, 10)
         time.sleep(2)
 
 
@@ -93,7 +93,7 @@ class D2Window():
     def click(self, x, y, clicks=1, speed=0):
 
         self.au3.AU3_MouseClick("left", x, y, clicks, speed)
-        self.au3.AU3_MouseMove(0, 0, 0)
+        self.au3.AU3_MouseMove(10, 10, 0)
 
 
     def join(self):
@@ -159,7 +159,6 @@ class D2Window():
 
                 time.sleep(1)
 
-        self.send("m")
         self.start_time = time.time()
         return True
 
@@ -224,6 +223,18 @@ def muber(dst_ips, dst_ports, accounts, starter):
                     badwins.append(win)
                     print(str.format("*{} wrong acc or pass", win.account))
 
+            else:
+
+                au3.AU3_WinSetTitle(
+                    win.title,
+                    "",
+                    str.format(
+                        "{} [{}] [{}]",
+                        win.title,
+                        seconds_to_human(time.time() - win.start_time),
+                        ns[win.pid]
+                    )
+                )
 
         wins = list(filter(lambda w: w not in badwins, wins))
         time.sleep(timeout)
