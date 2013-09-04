@@ -308,6 +308,14 @@ if __name__ == "__main__":
 
     dst_ips = ("212.42.38.182", "212.42.38.174", "212.42.38.87")
     dst_ports = ("4000",)
-    accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
+
+    try:
+
+        accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
+
+    except:
+
+        log("error: can't read 'accounts.txt'")
+        exit()
 
     muber(dst_ips, dst_ports, accounts, lambda: os.startfile("d2.lnk"))
