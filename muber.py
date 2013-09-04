@@ -177,8 +177,8 @@ def muber(dst_ips, dst_ports, accounts, starter):
     au3 = au3bind.autoit()
     nstat = lambda: netstat(dst_ips, dst_ports)
 
-    au3.AU3_AutoItSetOption("SendKeyDelay", 20)
-    au3.AU3_AutoItSetOption("SendKeyDownDelay", 20)
+    au3.AU3_AutoItSetOption("SendKeyDelay", 50)
+    au3.AU3_AutoItSetOption("SendKeyDownDelay", 50)
     au3.AU3_AutoItSetOption("SendCapslockMode", 0)
     au3.AU3_AutoItSetOption("WinTitleMatchMode", 2)
     au3.AU3_AutoItSetOption("MouseClickDownDelay", 25)
