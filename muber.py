@@ -52,13 +52,16 @@ class D2Window():
         "IN_GAME":((0, 550, 30, 600), 4171787830),
     }
 
-    def __init__(self, account, password, starter, au3):
+    def __init__(self, account, password, starter, au3, max_bad_pass_acc_count=3):
 
         self.account = account
         self.password = password
         self.title = D2Window.title_base + str(D2Window.title_num)
         self.au3 = au3
         self.start_time = None
+
+        self.max_bad_pass_acc_count = max_bad_pass_acc_count
+        self.bad_count = 0
 
         D2Window.title_num += 1
 
@@ -135,10 +138,16 @@ class D2Window():
 
                     elif action == "BAD_ACC_PASS":
 
-                        return False
+                        self.send("{ENTER}")
+                        self.bad_count += 1
+
+                        if self.bad_count == self.max_bad_pass_acc_count:
+
+                            return False
 
                     elif action == "CHAR_SCREEN":
 
+                        self.bad_count = 0
                         self.send("{ENTER}")
 
                     elif action == "CREATE_GAME":
