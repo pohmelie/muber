@@ -3,6 +3,8 @@ import os
 import time
 import subprocess
 import math
+import sojwatcher
+import multiprocessing
 
 
 def netstat(dst_ips, dst_ports):
@@ -82,6 +84,7 @@ class D2Window():
 
         self.send("{ESC}")
         self.click(400, 260)
+        self.start_time = None
         time.sleep(D2Window.timeout_exit_game)
 
 
@@ -170,12 +173,21 @@ def seconds_to_human(x):
     return str.format("{:0>2}:{:0>2}:{:0>2}", h, m, s)
 
 
-def muber(dst_ips, dst_ports, accounts, starter):
+def log(s):
 
-    timeout = 10
+    print(str.format("{}: {}", time.strftime("[%d.%m %H:%M:%S]"), s))
+
+
+def muber(dst_ips, dst_ports, accounts, starter, timeout=10, soj_limit=10):
+
+    soj_ip_stats = {}
+    soj_info = multiprocessing.Queue()
+    soj_info_history = set()
+    sojw = sojwatcher.SojWatcher(dst_ips, dst_ports, soj_info)
+    sojw.start()
+
     games_per_ip = math.ceil(len(accounts) / len(dst_ips))
     au3 = au3bind.autoit()
-    nstat = lambda: netstat(dst_ips, dst_ports)
 
     au3.AU3_AutoItSetOption("SendKeyDelay", 50)
     au3.AU3_AutoItSetOption("SendKeyDownDelay", 50)
@@ -192,7 +204,60 @@ def muber(dst_ips, dst_ports, accounts, starter):
 
     while True:
 
-        ns = nstat()
+        while not soj_info.empty():
+
+            soj, ip = soj_info.get()
+
+            if (soj, ip) in soj_info_history:
+
+                continue
+
+            soj_info_history.add((soj, ip))
+
+            if soj > 0:
+
+                if ip not in soj_ip_stats:
+
+                    soj_ip_stats[ip] = soj - 1
+
+                log(
+                    str.format(
+                        "{} ({}) stones of jordan on {}",
+                        soj,
+                        soj - soj_ip_stats[ip],
+                        ip
+                    )
+                )
+
+                if soj - soj_ip_stats[ip] > soj_limit:
+
+                    log(
+                        str.format(
+                            "more than {} stones of jordan sold on same ip, trying to connect to {}",
+                            soj_limit,
+                            ip
+                        )
+                    )
+                    dst_ips = (ip,)
+                    games_per_ip = len(accounts)
+
+            elif soj == -1:
+
+                log(str.format("diablo walks the earth on {}, stopped", ip))
+                sojw.terminate()
+
+                ns = netstat((ip,), dst_ports)
+                log(
+                    str.format(
+                        "uber windows: {}",
+                        str.join(", ", map(lambda w: w.title, filter(lambda w: w.pid in ns, wins)))
+                    )
+                )
+
+                input()
+                exit()
+
+        ns = netstat(dst_ips, dst_ports)
         badwins = []
 
         for win in wins:
@@ -201,27 +266,30 @@ def muber(dst_ips, dst_ports, accounts, starter):
 
                 if win.start_time:
 
-                    print(
+                    log(
                         str.format(
-                            "*{} dropped after {}",
-                            win.account,
+                            "{} dropped after {}",
+                            win.title,
                             seconds_to_human(time.time() - win.start_time)
                         )
                     )
 
-                while win.join():
+                if win.join():
 
-                    ns = nstat()
+                    ns = netstat(dst_ips, dst_ports)
 
-                    if tuple(ns.values()).count(ns[win.pid]) <= games_per_ip:
+                    if win.pid in ns and tuple(ns.values()).count(ns[win.pid]) <= games_per_ip:
 
-                        print(str.format("*{} -> {}", win.account, ns[win.pid]))
-                        break
+                        log(str.format("{} -> {}", win.title, ns[win.pid]))
+
+                    else:
+
+                        win.leave()
 
                 else:
 
                     badwins.append(win)
-                    print(str.format("*{} wrong acc or pass", win.account))
+                    log(str.format("{} (*{}) wrong acc or pass". win.title, win.account))
 
         wins = list(filter(lambda w: w not in badwins, wins))
         time.sleep(timeout)
