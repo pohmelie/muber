@@ -184,7 +184,9 @@ def seconds_to_human(x):
 
 def log(s):
 
-    print(str.format("{}: {}", time.strftime("[%d.%m %H:%M:%S]"), s))
+    msg = str.format("{}: {}", time.strftime("[%d.%m %H:%M:%S]"), s)
+    print(msg)
+    open("muber.log", "w+").write(msg + "\n")
 
 
 def muber(dst_ips, dst_ports, accounts, starter, timeout=10, soj_limit=10):
