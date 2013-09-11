@@ -53,7 +53,7 @@ class D2Window():
         "IN_GAME":((0, 550, 30, 600), 4171787830),
     }
 
-    def __init__(self, account, password, starter, au3, max_bad_pass_acc_count=3, max_long_waiting_count=10):
+    def __init__(self, account, password, starter, au3, max_bad_pass_acc_count=3, max_long_waiting_count=10, reconnection_delay=30):
 
         self.account = account
         self.password = password
@@ -63,6 +63,7 @@ class D2Window():
 
         self.max_bad_pass_acc_count = max_bad_pass_acc_count
         self.max_long_waiting_count = max_long_waiting_count
+        self.reconnection_delay = reconnection_delay
 
         self.bad_count = 0
         self.long_waiting_count = 0
@@ -138,6 +139,7 @@ class D2Window():
                         if self.long_waiting_count == self.max_long_waiting_count:
 
                             self.click(400, 400)
+                            time.sleep(self.reconnection_delay)
 
                     elif action == "CONNECTION_ERROR":
 
@@ -326,7 +328,7 @@ if __name__ == "__main__":
 
     try:
 
-        accounts = tuple(map(lambda line: line.strip().split("/"), open("accounts.txt")))
+        accounts = tuple(filter(lambda d: len(d) == 2, map(lambda line: line.strip().split("/"), open("accounts.txt"))))
 
     except:
 
