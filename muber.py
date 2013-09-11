@@ -44,6 +44,7 @@ class D2Window():
     screens = {
         "INIT":((350, 250, 450, 300), 3406352),
         "MAIN_MENU":((350, 250, 450, 300), 3876691790),
+        "LONG_WAITING":((300, 375, 500, 425), 1000080459),
         "CONNECTION_ERROR":((250, 500, 350, 575), 2601569465),
         "LOGIN":((30, 540, 160, 580), 2060892196),
         "BAD_ACC_PASS":((30, 540, 160, 580), 836154227),
@@ -52,7 +53,7 @@ class D2Window():
         "IN_GAME":((0, 550, 30, 600), 4171787830),
     }
 
-    def __init__(self, account, password, starter, au3, max_bad_pass_acc_count=3):
+    def __init__(self, account, password, starter, au3, max_bad_pass_acc_count=3, max_long_waiting_count=10):
 
         self.account = account
         self.password = password
@@ -61,7 +62,10 @@ class D2Window():
         self.start_time = None
 
         self.max_bad_pass_acc_count = max_bad_pass_acc_count
+        self.max_long_waiting_count = max_long_waiting_count
+
         self.bad_count = 0
+        self.long_waiting_count = 0
 
         D2Window.title_num += 1
 
@@ -124,7 +128,16 @@ class D2Window():
 
                     elif action == "MAIN_MENU":
 
+                        self.long_waiting_count = 0
                         self.click(400, 350)
+
+                    elif action == "LONG_WAITING":
+
+                        self.long_waiting_count += 1
+
+                        if self.long_waiting_count == self.max_long_waiting_count:
+
+                            self.click(400, 400)
 
                     elif action == "CONNECTION_ERROR":
 
@@ -186,7 +199,7 @@ def log(s):
 
     msg = str.format("{}: {}", time.strftime("[%d.%m %H:%M:%S]"), s)
     print(msg)
-    open("muber.log", "w+").write(msg + "\n")
+    open("muber.log", "a").write(msg + "\n")
 
 
 def muber(dst_ips, dst_ports, accounts, starter, timeout=10, soj_limit=10):
